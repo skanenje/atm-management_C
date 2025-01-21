@@ -186,6 +186,7 @@ int findAccount(struct User u, int accountNum, struct Record *record) {
     return 0;
 }
 
+
 int updateRecordFile(struct Record updatedRecord) {
     FILE *fp = fopen(RECORDS, "r");
     FILE *tempFp = fopen("temp.txt", "w");
@@ -200,13 +201,13 @@ int updateRecordFile(struct Record updatedRecord) {
 
     // Copy all records to temp file, replacing the one to update
     while (getAccountFromFile(fp, userName, &r)) {
-        if (r.accountNbr == updatedRecord.accountNbr && 
-            strcmp(userName, updatedRecord.name) == 0) {
+        if (r.accountNbr == updatedRecord.accountNbr) {
             // Write updated record
+            // Preserve original ID and userId when writing
             fprintf(tempFp, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n",
-                    updatedRecord.id,
-                    updatedRecord.userId,
-                    updatedRecord.name,
+                    r.id,  // Keep original ID
+                    r.userId,  // Keep original userId
+                    userName,  // Keep original username
                     updatedRecord.accountNbr,
                     updatedRecord.deposit.month,
                     updatedRecord.deposit.day,
@@ -217,7 +218,7 @@ int updateRecordFile(struct Record updatedRecord) {
                     updatedRecord.accountType);
             found = 1;
         } else {
-            // Write existing record
+            // Write existing record as is
             fprintf(tempFp, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n",
                     r.id,
                     r.userId,
@@ -299,7 +300,7 @@ float calculateInterest(struct Record r) {
     float monthlyInterest;
     
     // Set interest rate based on account type
-    if (strcmp(r.accountType, "savings") == 0) {
+    if (strcmp(r.accountType, "saving") == 0) {
         interestRate = 0.07;  // 7%
     }
     else if (strcmp(r.accountType, "fixed01") == 0) {
@@ -335,8 +336,8 @@ void displayAccountDetails(struct Record r, float interest) {
     if (strcmp(r.accountType, "current") == 0) {
         printf("\n\n\tNote: This is a current account. No interest will be earned.");
     } else {
-        printf("\n\n\tMonthly Interest: $%.2f", interest);
-        printf("\n\tYou will get $%.2f as interest on day %d of every month",
+        printf("\n\n\tMonthly Interest: $%.3f", interest);
+        printf("\n\tYou will get $%.3f as interest on day %d of every month",
                interest, r.deposit.day);
     }
     
@@ -377,5 +378,95 @@ void checkAccountDetails(struct User u) {
         stayOrReturn(0, checkAccountDetails, u);
     } else {
         stayOrReturn(1, checkAccountDetails, u);
+    }
+}
+void makeTransaction(struct User u)
+{
+    struct Record r;
+    char userName[50];
+    int accountNum, transactionType;
+    double amount;
+    int found = 0;
+    
+    system("clear");
+    printf("\n\t\t====== Make Transaction ======\n");
+    
+    printf("\nEnter account number: ");
+    scanf("%d", &accountNum);
+    
+    // Open file for reading
+    FILE *fp = fopen(RECORDS, "r");
+    if (fp == NULL) {
+        printf("\n\t\t✖ Error opening file!");
+        return;
+    }
+    
+    // Find the account
+    while (getAccountFromFile(fp, userName, &r)) {
+        if (strcmp(userName, u.name) == 0 && r.accountNbr == accountNum) {
+            found = 1;
+            break;
+        }
+    }
+    fclose(fp);
+    
+    if (!found) {
+        printf("\n\t\t✖ Account not found or unauthorized access!");
+        stayOrReturn(0, makeTransaction, u);
+        return;
+    }
+    
+    // Check if account type allows transactions
+    if (strstr(r.accountType, "fixed") != NULL) {
+        printf("\n\t\t✖ Transactions are not allowed for fixed deposit accounts!");
+        stayOrReturn(0, makeTransaction, u);
+        return;
+    }
+    
+    // Get transaction type
+    printf("\nSelect transaction type:");
+    printf("\n1. Deposit");
+    printf("\n2. Withdraw");
+    printf("\nEnter choice (1-2): ");
+    scanf("%d", &transactionType);
+    
+    if (transactionType != 1 && transactionType != 2) {
+        printf("\n\t\t✖ Invalid transaction type!");
+        stayOrReturn(0, makeTransaction, u);
+        return;
+    }
+    
+    // Get amount
+    printf("\nEnter amount: $");
+    scanf("%lf", &amount);
+    
+    if (amount <= 0) {
+        printf("\n\t\t✖ Invalid amount! Amount must be positive.");
+        stayOrReturn(0, makeTransaction, u);
+        return;
+    }
+    
+    // Handle withdraw specific validation
+    if (transactionType == 2) {
+        if (amount > r.amount) {
+            printf("\n\t\t✖ Insufficient funds! Current balance: $%.2f", r.amount);
+            stayOrReturn(0, makeTransaction, u);
+            return;
+        }
+        r.amount -= amount;
+        printf("\n\t\t✔ Withdrawn: $%.2f", amount);
+    } else {
+        r.amount += amount;
+        printf("\n\t\t✔ Deposited: $%.2f", amount);
+    }
+    
+    // Update the record
+    if (updateRecordFile(r)) {
+        printf("\n\t\t✔ Transaction successful!");
+        printf("\n\t\tNew balance: $%.2f", r.amount);
+        success(u);
+    } else {
+        printf("\n\t\t✖ Error updating account!");
+        stayOrReturn(0, makeTransaction, u);
     }
 }

@@ -31,7 +31,6 @@ struct User
 
 // authentication functions
 void loginMenu(char a[50], char pass[50]);
-// void registerMenu(char a[50], char pass[50]);
 const char *getPassword(struct User u);
 void registerMenu(struct User *u);
 int checkUserExists(char username[50]);
@@ -45,3 +44,4 @@ float calculateInterest(struct Record r);
 void displayAccountDetails(struct Record r, float interest);
 void updateAccountInfo(struct User u);
 int updateRecordFile(struct Record updatedRecord);
+void makeTransaction(struct User u);

@@ -45,3 +45,5 @@ void displayAccountDetails(struct Record r, float interest);
 void updateAccountInfo(struct User u);
 int updateRecordFile(struct Record updatedRecord);
 void makeTransaction(struct User u);
+void removeExistingAccount(struct User u);
+void transferOwnership(struct User u);

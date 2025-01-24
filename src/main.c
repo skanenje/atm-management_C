@@ -34,12 +34,10 @@ void mainMenu(struct User u)
         makeTransaction(u);
         break;
     case 6:
-        // student TODO : add your **Remove existing account** function
-        // here
+        removeExistingAccount(u);
         break;
     case 7:
-        // student TODO : add your **Transfer owner** function
-        // here
+        transferOwnership(u);
         break;
     case 8:
         exit(1);
@@ -68,7 +66,7 @@ void initMenu(struct User *u)
             loginMenu(u->name, u->password);
             if (strcmp(u->password, getPassword(*u)) == 0)
             {
-                printf("\n\nPassword Match!");
+                printf("\n\nLogin Succesful!");
             }
             else
             {
@@ -78,7 +76,7 @@ void initMenu(struct User *u)
             r = 1;
             break;
         case 2:
-            registerMenu(u);
+            registerMenu(u);    
             r = 1;
             break;
         case 3:

@@ -9,6 +9,7 @@ void loginMenu(char a[50], char pass[50])
 
     system("clear");
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:");
+    printf("\n\n\t\t\t\tUsername: ");
     scanf("%s", a);
 
     // disabling echo
@@ -32,7 +33,6 @@ void loginMenu(char a[50], char pass[50])
         return exit(1);
     }
 };
-
 const char *getPassword(struct User u)
 {
     FILE *fp;
@@ -44,19 +44,20 @@ const char *getPassword(struct User u)
         exit(1);
     }
 
-    while (fscanf(fp, "%s %s", userChecker.name, userChecker.password) != EOF)
+    while (fscanf(fp, "%d %s %s", &userChecker.id, userChecker.name, userChecker.password) != EOF)
     {
         if (strcmp(userChecker.name, u.name) == 0)
         {
             fclose(fp);
-            char *buff = userChecker.password;
-            return buff;
+            // Use strdup to create a dynamically allocated copy of the password
+            return strdup(userChecker.password);
         }
     }
 
     fclose(fp);
     return "no user found";
 }
+
 int getLastUserId() {
     FILE *fp;
     struct User userChecker;
@@ -107,7 +108,6 @@ void saveUserToFile(struct User u) {
     fprintf(fp, "%d %s %s\n", u.id, u.name, u.password);
     fclose(fp);
 }
-
 void registerMenu(struct User *u) {
     struct termios oflags, nflags;
     char password[50];
@@ -115,41 +115,47 @@ void registerMenu(struct User *u) {
     system("clear");
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Registration\n");
     
-    // Get username
-    printf("\n\n\t\t\t\tEnter username: ");
-    scanf("%s", u->name);
+    // Flag to control registration loop
+    int registrationFailed = 0;
     
-    // Check if user already exists
-    if (checkUserExists(u->name)) {
-        printf("\n\t\t\tUser already exists! Please choose a different username.\n");
-        printf("\n\t\t\tPress any key to continue...");
-        getchar();
-        getchar();
-        return;
-    }
-    
-    // Get password (with hidden input)
-    printf("\n\n\t\t\t\tEnter password: ");
-    
-    // Disable echo
-    tcgetattr(fileno(stdin), &oflags);
-    nflags = oflags;
-    nflags.c_lflag &= ~ECHO;
-    nflags.c_lflag |= ECHONL;
-    
-    if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0) {
-        perror("tcsetattr");
-        return;
-    }
-    
-    scanf("%s", password);
-    strcpy(u->password, password);
-    
-    // Restore terminal settings
-    if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0) {
-        perror("tcsetattr");
-        return;
-    }
+    do {
+        // Get username
+        printf("\n\n\t\t\t\tEnter username: ");
+        scanf("%s", u->name);
+        
+        // Check if user already exists
+        if (checkUserExists(u->name)) {
+            printf("\n\t\t\tUser already exists! Please choose a different username.\n");
+            registrationFailed = 1;
+            continue;  // Restart the loop
+        } else {
+            registrationFailed = 0;
+        }
+        
+        // Get password (with hidden input)
+        printf("\n\n\t\t\t\tEnter password: ");
+        
+        // Disable echo
+        tcgetattr(fileno(stdin), &oflags);
+        nflags = oflags;
+        nflags.c_lflag &= ~ECHO;
+        nflags.c_lflag |= ECHONL;
+        
+        if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0) {
+            perror("tcsetattr");
+            return;
+        }
+        
+        scanf("%s", password);
+        strcpy(u->password, password);
+        
+        // Restore terminal settings
+        if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0) {
+            perror("tcsetattr");
+            return;
+        }
+        
+    } while (registrationFailed);
     
     // Generate new user ID
     u->id = getLastUserId();

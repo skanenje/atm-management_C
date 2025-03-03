@@ -1,5 +1,23 @@
+/**
+ * @file main.c
+ * @brief Main entry point for the ATM Management System
+ * 
+ * This file contains the main program entry point and the menu handling
+ * functions for the ATM Management System. It manages the initial login/register
+ * menu and the main operation menu after successful authentication.
+ */
+
 #include "header.h"
 
+/**
+ * @brief Displays the main menu and handles user selections
+ * 
+ * This function displays the main menu of the ATM system after successful
+ * login, presenting options for account management and transactions.
+ * It processes the user's selection and calls the appropriate function.
+ * 
+ * @param u User structure of the logged-in user
+ */
 void mainMenu(struct User u)
 {
     int option;
@@ -47,6 +65,15 @@ void mainMenu(struct User u)
     }
 };
 
+/**
+ * @brief Displays the initial menu for login or registration
+ * 
+ * This function presents the initial menu where users can choose to
+ * login with existing credentials or register a new account.
+ * It handles the authentication process before proceeding to the main menu.
+ * 
+ * @param u Pointer to User structure to store the authenticated user's information
+ */
 void initMenu(struct User *u)
 {
     int r = 0;
@@ -88,6 +115,14 @@ void initMenu(struct User *u)
     }
 };
 
+/**
+ * @brief Main entry point of the ATM Management System
+ * 
+ * Initializes the program, displays the initial menu for authentication,
+ * and proceeds to the main menu after successful login or registration.
+ * 
+ * @return 0 on successful program execution
+ */
 int main()
 {
     struct User u;

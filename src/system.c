@@ -97,7 +97,15 @@ invalid:
         goto invalid;
     }
 }
-// helper functions to check if the date is valid
+/**
+ * @brief Validates a date
+ * 
+ * This function checks if a given date is valid, considering
+ * month ranges, day ranges, and leap years.
+ * 
+ * @param date Date structure to validate
+ * @return 1 if the date is valid, 0 otherwise
+ */
 int isValidDate(struct Date date) {
     int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -113,7 +121,16 @@ int isValidDate(struct Date date) {
 
     return 1;
 }
-// function to create a new account
+/**
+ * @brief Creates a new bank account for the user
+ * 
+ * This function guides the user through the process of creating a new bank account.
+ * It collects information such as deposit date, account number, country, phone number,
+ * initial deposit amount, and account type. It validates the input data and ensures
+ * the account number is unique for the user before saving the new account.
+ * 
+ * @param u User structure of the account owner
+ */
 void createNewAcc(struct User u) {
     struct Record r;
     struct Record cr;
@@ -235,7 +252,14 @@ int findAccount(struct User u, int accountNum, struct Record *record) {
     fclose(fp);
     return 0;
 }
-// function to update account information
+/**
+ * @brief Updates information for an existing account
+ * 
+ * This function allows the user to update specific information for an
+ * existing account, such as country and phone number.
+ * 
+ * @param u User structure of the account owner
+ */
 void updateAccountInfo(struct User u) {
     int accountNum, choice;
     struct Record record;
@@ -376,6 +400,14 @@ void displayAccountDetails(struct Record r, float interest) {
 
     printf("\n\n\t≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡\n");
 }
+/**
+ * @brief Displays details of a specific account
+ * 
+ * This function allows the user to view detailed information about
+ * a specific account, including its balance and calculated interest.
+ * 
+ * @param u User structure of the account owner
+ */
 void checkAccountDetails(struct User u) {
     int accountNum;
     struct Record r;
@@ -631,6 +663,15 @@ void removeExistingAccount(struct User u)
         stayOrReturn(0, removeExistingAccount, u);
     }
 }
+/**
+ * @brief Transfers account ownership to another user
+ * 
+ * This function allows a user to transfer ownership of an account
+ * to another registered user. It includes validation of the target
+ * user and confirmation prompts.
+ * 
+ * @param u User structure of the current account owner
+ */
 void transferOwnership(struct User u) {
     struct Record r;
     char userName[50];

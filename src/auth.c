@@ -33,6 +33,15 @@ void loginMenu(char a[50], char pass[50])
         return exit(1);
     }
 };
+/**
+ * @brief Retrieves the password for a given user
+ * 
+ * This function searches the users file for a user with the specified
+ * name and returns their password if found.
+ * 
+ * @param u User structure containing the username to look up
+ * @return The user's password if found, or "no user found" if not found
+ */
 const char *getPassword(struct User u)
 {
     FILE *fp;
@@ -78,6 +87,15 @@ int getLastUserId() {
     return lastId + 1;
 }
 
+/**
+ * @brief Checks if a username already exists
+ * 
+ * This function searches the users file to determine if a
+ * given username is already registered in the system.
+ * 
+ * @param username Username to check
+ * @return 1 if the user exists, 0 otherwise
+ */
 int checkUserExists(char username[50]) {
     FILE *fp;
     struct User userChecker;
@@ -98,6 +116,13 @@ int checkUserExists(char username[50]) {
     return 0;  // User doesn't exist
 }
 
+/**
+ * @brief Saves a user to the users file
+ * 
+ * This function appends a new user record to the users file.
+ * 
+ * @param u User structure containing the information to save
+ */
 void saveUserToFile(struct User u) {
     FILE *fp;
     fp = fopen(USERS, "a");
@@ -108,6 +133,15 @@ void saveUserToFile(struct User u) {
     fprintf(fp, "%d %s %s\n", u.id, u.name, u.password);
     fclose(fp);
 }
+/**
+ * @brief Displays the registration menu and registers a new user
+ * 
+ * This function handles the user registration process, including
+ * username validation, secure password input, and saving the new
+ * user to the users file.
+ * 
+ * @param u Pointer to User structure to store the new user's information
+ */
 void registerMenu(struct User *u) {
     struct termios oflags, nflags;
     char password[50];
